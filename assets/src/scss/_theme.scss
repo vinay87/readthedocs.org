@@ -1,0 +1,24 @@
+// Custom CSS overrides
+#main-logo {
+  height: 50px;
+  width: auto;
+}
+
+main {
+  padding: 3rem 0;
+}
+
+footer {
+  background-color: $dark;
+  color: $gray-400;
+  padding: 3rem 0;
+
+
+  a, a:visited {
+    color: $gray-100;
+  }
+
+  a:active, a:hover {
+    color: lighten($gray-100, 15%);
+  }
+}

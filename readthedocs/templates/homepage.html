@@ -1,172 +1,295 @@
-{% extends "base.html" %}
-
 {% load i18n %}
+{% load core_tags %}
+{% load static %}
 {% load humanize %}
 {% load pagination_tags %}
 {% load cache %}
 
-{% block extra_metas %}
-  <meta name="description" content="{% trans "Read the Docs simplifies technical documentation by automating building, versioning, and hosting for you. Build up-to-date documentation for the web, print, and offline use on every version control push automatically." %}">
-{% endblock extra_metas %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-{% block title %}{% trans "Home" %}{% endblock %}
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'main.css' %}">
 
-{% block body_class %}home {% if not request.user.is_authenticated %}splash{% endif %}{% endblock %}
+    <title>{% trans "Home" %} | Read the Docs</title>
+  </head>
+  <body>
 
-{% block nav-browse %}class="active"{% endblock %}
-
-{% block header-wrapper %}
-  {% if request.user.is_authenticated %}
-    {% include "core/header.html" %}
-  {% else %}
-    {% include "core/home-header.html" %}
-  {% endif %}
-{% endblock %}
-
-{% block extra_scripts %}
-        <script>
-    $(document).ready(function() {
-            // Show action on hover
-            $(".module-item-menu").hover(
-              function () {
-                $(".hidden-child", this).show();
-              }, function () {
-                $(".hidden-child", this).hide();
-              }
-            );
-    });
-        </script>
-{% endblock %}
-
-
-{% block content %}
-
-  <!-- Lead -->
-  <section>
-    <h2>{% trans "Technical documentation lives here" %}</h2>
-    <p class="lead">
-      {% blocktrans trimmed %}
-      Read the Docs simplifies software documentation by automating building,
-      versioning, and hosting of your docs for you.
-      {% endblocktrans %}
-    </p>
-  </section>
-
-
-  <section>
-    <div class="feature">
-      <h3>Free docs hosting</h3>
-      <p>
-        {% with projects_count_intcomma=projects_count|intcomma %}
-        {% blocktrans trimmed %}
-        We will host your documentation for free forever.
-        There are no tricks. We help {{ projects_count_intcomma }} open source projects
-        share their docs.
-        {% endblocktrans %}
-        {% endwith %}
-      </p>
-    </div>
-    <div class="feature">
-      <h3>Webhooks</h3>
-      <p>
-        {% blocktrans trimmed %}
-        Whenever you push code to your favorite version control system,
-        whether that is Git, Mercurial, Bazaar, or Subversion, we will
-        automatically build your docs so your code and documentation are
-        never out of sync.
-        {% endblocktrans %}
-      </p>
-    </div>
-    <div class="clearfix"></div>
-  </section>
-
-  <section>
-    <div class="feature">
-      <h3>Multiple formats</h3>
-      <p>
-        {% blocktrans trimmed %}
-        Of course we build and host your docs for the web, but they are
-        also vieweable as PDFs, as single page HTML, and for eReaders.
-        No additional configuration is required.
-        {% endblocktrans %}
-      </p>
-    </div>
-    <div class="feature">
-      <h3>Multiple versions</h3>
-      <p>
-        {% blocktrans trimmed %}
-        We can host and build multiple versions of your docs so having a
-        1.0 version of your docs and a 2.0 version of your docs is as easy
-        as having a separate branch or tag in your version control system.
-        {% endblocktrans %}
-      </p>
-    </div>
-    <div class="clearfix"></div>
-  </section>
-
-  <!-- Call to action -->
-  <section>
-    <p style="text-align: center">
-      <a href="https://docs.readthedocs.io/en/latest/getting_started.html" class="cta-btn">{% trans 'Getting started guide' %}</a>
-    </p>
-  </section>
-
-  <!-- Search -->
-  <section>
-    {% include "core/widesearchbar.html" %}
-  </section>
-
-  {% if featured_list %}
-  {% get_current_language as language %}
-  {% cache 600 homepage_featured_list language %}
-    <!-- BEGIN projects list -->
-    <section>
-      <h3>{% trans "Featured Projects" %}</h3>
-      <div class="module-list">
-        <div class="module-list-wrapper">
-          <ul style="margin-bottom: 0">
-            {% include "core/project_list_featured.html" %}
-          </ul>
+    <header>
+      <div class="navbar navbar-dark bg-dark shadow-sm">
+        <div class="container d-flex justify-content-between">
+          <a href="/" class="navbar-brand d-flex align-items-center">
+            <img id="main-logo" alt="Read the Docs logo" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhLS0gQ3JlYXRlZCB3aXRoIElua3NjYXBlIChodHRwOi8vd3d3Lmlua3NjYXBlLm9yZy8pIC0tPgoKPHN2ZwogICB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iCiAgIHhtbG5zOmNjPSJodHRwOi8vY3JlYXRpdmVjb21tb25zLm9yZy9ucyMiCiAgIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyIKICAgeG1sbnM6c3ZnPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogICB4bWxuczpzb2RpcG9kaT0iaHR0cDovL3NvZGlwb2RpLnNvdXJjZWZvcmdlLm5ldC9EVEQvc29kaXBvZGktMC5kdGQiCiAgIHhtbG5zOmlua3NjYXBlPSJodHRwOi8vd3d3Lmlua3NjYXBlLm9yZy9uYW1lc3BhY2VzL2lua3NjYXBlIgogICB3aWR0aD0iMjAwMCIKICAgaGVpZ2h0PSI0MDAiCiAgIGlkPSJzdmc1MjQxIgogICB2ZXJzaW9uPSIxLjEiCiAgIGlua3NjYXBlOnZlcnNpb249IjAuNDguNSByMTAwNDAiCiAgIHNvZGlwb2RpOmRvY25hbWU9ImxvZ28td29yZG1hcmstbGlnaHQuc3ZnIgogICBpbmtzY2FwZTpleHBvcnQtZmlsZW5hbWU9Ii9Vc2Vycy9hbnRob255L2Rldi9yZWFkdGhlZG9jcy9ndWlkZWxpbmVzL2Fzc2V0cy9sb2dvLXdvcmRtYXJrLWxpZ2h0LnBuZyIKICAgaW5rc2NhcGU6ZXhwb3J0LXhkcGk9IjkwIgogICBpbmtzY2FwZTpleHBvcnQteWRwaT0iOTAiPgogIDxkZWZzCiAgICAgaWQ9ImRlZnM1MjQzIiAvPgogIDxzb2RpcG9kaTpuYW1lZHZpZXcKICAgICBpZD0iYmFzZSIKICAgICBwYWdlY29sb3I9IiMzMjMyMmEiCiAgICAgYm9yZGVyY29sb3I9IiM2NjY2NjYiCiAgICAgYm9yZGVyb3BhY2l0eT0iMS4wIgogICAgIGlua3NjYXBlOnBhZ2VvcGFjaXR5PSIxIgogICAgIGlua3NjYXBlOnBhZ2VzaGFkb3c9IjIiCiAgICAgaW5rc2NhcGU6em9vbT0iMC43MDcxMDY3OCIKICAgICBpbmtzY2FwZTpjeD0iNzc0Ljk4NjEiCiAgICAgaW5rc2NhcGU6Y3k9Ijg2LjM2MDQyNSIKICAgICBpbmtzY2FwZTpkb2N1bWVudC11bml0cz0icHgiCiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0idGV4dDUyOTgiCiAgICAgc2hvd2dyaWQ9ImZhbHNlIgogICAgIGlua3NjYXBlOndpbmRvdy13aWR0aD0iMTM2NiIKICAgICBpbmtzY2FwZTp3aW5kb3ctaGVpZ2h0PSI3MjMiCiAgICAgaW5rc2NhcGU6d2luZG93LXg9IjAiCiAgICAgaW5rc2NhcGU6d2luZG93LXk9IjI2IgogICAgIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjAiIC8+CiAgPG1ldGFkYXRhCiAgICAgaWQ9Im1ldGFkYXRhNTI0NiI+CiAgICA8cmRmOlJERj4KICAgICAgPGNjOldvcmsKICAgICAgICAgcmRmOmFib3V0PSIiPgogICAgICAgIDxkYzpmb3JtYXQ+aW1hZ2Uvc3ZnK3htbDwvZGM6Zm9ybWF0PgogICAgICAgIDxkYzp0eXBlCiAgICAgICAgICAgcmRmOnJlc291cmNlPSJodHRwOi8vcHVybC5vcmcvZGMvZGNtaXR5cGUvU3RpbGxJbWFnZSIgLz4KICAgICAgICA8ZGM6dGl0bGU+PC9kYzp0aXRsZT4KICAgICAgPC9jYzpXb3JrPgogICAgPC9yZGY6UkRGPgogIDwvbWV0YWRhdGE+CiAgPGcKICAgICBpbmtzY2FwZTpsYWJlbD0iTGF5ZXIgMSIKICAgICBpbmtzY2FwZTpncm91cG1vZGU9ImxheWVyIgogICAgIGlkPSJsYXllcjEiCiAgICAgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwtNjUyLjM2MjIpIj4KICAgIDxnCiAgICAgICBpZD0iZzUzMTAiCiAgICAgICB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNy4yODc3NTMzLC02LjM1NDY4MjFlLTUpIgogICAgICAgc3R5bGU9ImZpbGw6I2ZhZmFmYTtmaWxsLW9wYWNpdHk6MSI+CiAgICAgIDxnCiAgICAgICAgIGlua3NjYXBlOmV4cG9ydC15ZHBpPSI5MCIKICAgICAgICAgaW5rc2NhcGU6ZXhwb3J0LXhkcGk9IjkwIgogICAgICAgICBpbmtzY2FwZTpleHBvcnQtZmlsZW5hbWU9Ii9ob21lL2FudGhvbnkvc2VjdXJlL2RvY3MvcnRkL2Fzc2V0cy9ydGQtbG9nby0yLnBuZyIKICAgICAgICAgdHJhbnNmb3JtPSJtYXRyaXgoMC41NTc1MzY0NCwwLDAsMC41NTc1MzY0NCw2Mi4zMDgxMzUsMTAzOC44NzYyKSIKICAgICAgICAgaWQ9ImczOTkwIgogICAgICAgICBzdHlsZT0iZmlsbDojZmFmYWZhO2ZpbGwtb3BhY2l0eToxIiAvPgogICAgICA8ZwogICAgICAgICBpZD0iZzM4NzgiCiAgICAgICAgIHRyYW5zZm9ybT0ibWF0cml4KDguNDQ2MjgwMiwwLDAsOC40NDYyODAyLC05My40NjkyNjcsLTc4MjcuMTU5MykiCiAgICAgICAgIHN0eWxlPSJmaWxsOiNmYWZhZmE7ZmlsbC1vcGFjaXR5OjEiPgogICAgICAgIDxnCiAgICAgICAgICAgdHJhbnNmb3JtPSJtYXRyaXgoMC41NTc1MzY0NCwwLDAsMC41NTc1MzY0NCw2OC4zMDgxMzUsMTA1MC4xMjYyKSIKICAgICAgICAgICBpZD0iZzM4NTciCiAgICAgICAgICAgc3R5bGU9ImZpbGw6I2ZhZmFmYTtmaWxsLW9wYWNpdHk6MSI+CiAgICAgICAgICA8cGF0aAogICAgICAgICAgICAgaWQ9InBhdGgzOTI5LTgiCiAgICAgICAgICAgICBzdHlsZT0iZm9udC1zaXplOm1lZGl1bTtmb250LXN0eWxlOm5vcm1hbDtmb250LXZhcmlhbnQ6bm9ybWFsO2ZvbnQtd2VpZ2h0Om5vcm1hbDtmb250LXN0cmV0Y2g6bm9ybWFsO3RleHQtaW5kZW50OjA7dGV4dC1hbGlnbjpzdGFydDt0ZXh0LWRlY29yYXRpb246bm9uZTtsaW5lLWhlaWdodDpub3JtYWw7bGV0dGVyLXNwYWNpbmc6bm9ybWFsO3dvcmQtc3BhY2luZzpub3JtYWw7dGV4dC10cmFuc2Zvcm06bm9uZTtkaXJlY3Rpb246bHRyO2Jsb2NrLXByb2dyZXNzaW9uOnRiO3dyaXRpbmctbW9kZTpsci10Yjt0ZXh0LWFuY2hvcjpzdGFydDtiYXNlbGluZS1zaGlmdDpiYXNlbGluZTtjb2xvcjojMDAwMDAwO2ZpbGw6I2ZhZmFmYTtmaWxsLW9wYWNpdHk6MTtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6My4yMjg0ODg0NDk5OTk5OTk5NTttYXJrZXI6bm9uZTt2aXNpYmlsaXR5OnZpc2libGU7ZGlzcGxheTppbmxpbmU7b3ZlcmZsb3c6dmlzaWJsZTtlbmFibGUtYmFja2dyb3VuZDphY2N1bXVsYXRlO2ZvbnQtZmFtaWx5OlNhbnM7LWlua3NjYXBlLWZvbnQtc3BlY2lmaWNhdGlvbjpTYW5zIgogICAgICAgICAgICAgZD0iTSAtNjcuMjgxMjUsLTQxLjU5Mzc1IEEgMS42MTQ0MDU2LDEuNjE0NDA1NiAwIDAgMCAtNjcuNSwtMzguNDM3NSBjIDAsMCAzLjkzMTY5NSwxLjMwMTA0OSAxMC42MjUsMS44NDM3NSA1LjM3NDY4OSwwLjQzNTc4NiAxMS40Njg3NSwtMC4zNzUgMTEuNDY4NzUsLTAuMzc1IGEgMS42MTQ0MDU2LDEuNjE0NDA1NiAwIDEgMCAtMC40MDYyNSwtMy4xODc1IGMgMCwwIC01Ljk2MTYwNSwwLjczNzA2NiAtMTAuODEyNSwwLjM0Mzc1IEMgLTYzLjAxMzE3MSwtNDAuMzMwNDYxIC02Ni41LC00MS41IC02Ni41LC00MS41IGEgMS42MTQ0MDU2LDEuNjE0NDA1NiAwIDAgMCAtMC43ODEyNSwtMC4wOTM3NSB6IG0gMCwtOCBBIDEuNjE0NDA1NiwxLjYxNDQwNTYgMCAwIDAgLTY3LjUsLTQ2LjQzNzUgYyAwLDAgMy45MzE2OTUsMS4zMDEwNDkgMTAuNjI1LDEuODQzNzUgNS4zNzQ2ODksMC40MzU3ODYgMTEuNDY4NzUsLTAuMzc1IDExLjQ2ODc1LC0wLjM3NSBhIDEuNjE0NDA1NiwxLjYxNDQwNTYgMCAxIDAgLTAuNDA2MjUsLTMuMTg3NSBjIDAsMCAtNS45NjE2MDUsMC43MzcwNjYgLTEwLjgxMjUsMC4zNDM3NSBDIC02My4wMTMxNzEsLTQ4LjMzMDQ2MSAtNjYuNSwtNDkuNSAtNjYuNSwtNDkuNSBhIDEuNjE0NDA1NiwxLjYxNDQwNTYgMCAwIDAgLTAuNzgxMjUsLTAuMDkzNzUgeiBtIDAsLTggQSAxLjYxNDQwNTYsMS42MTQ0MDU2IDAgMCAwIC02Ny41LC01NC40Mzc1IGMgMCwwIDMuOTMxNjk1LDEuMzAxMDQ5IDEwLjYyNSwxLjg0Mzc1IDUuMzc0Njg5LDAuNDM1Nzg2IDExLjQ2ODc1LC0wLjM3NSAxMS40Njg3NSwtMC4zNzUgYSAxLjYxNDQwNTYsMS42MTQ0MDU2IDAgMSAwIC0wLjQwNjI1LC0zLjE4NzUgYyAwLDAgLTUuOTYxNjA1LDAuNzM3MDY2IC0xMC44MTI1LDAuMzQzNzUgQyAtNjMuMDEzMTcxLC01Ni4zMzA0NjEgLTY2LjUsLTU3LjUgLTY2LjUsLTU3LjUgYSAxLjYxNDQwNTYsMS42MTQ0MDU2IDAgMCAwIC0wLjc4MTI1LC0wLjA5Mzc1IHogbSAwLC04IEEgMS42MTQ0MDU2LDEuNjE0NDA1NiAwIDAgMCAtNjcuNSwtNjIuNDM3NSBjIDAsMCAzLjkzMTY5NSwxLjMwMTA0OSAxMC42MjUsMS44NDM3NSA1LjM3NDY4OSwwLjQzNTc4NiAxMS40Njg3NSwtMC4zNzUgMTEuNDY4NzUsLTAuMzc1IGEgMS42MTQ0MDU2LDEuNjE0NDA1NiAwIDEgMCAtMC40MDYyNSwtMy4xODc1IGMgMCwwIC01Ljk2MTYwNSwwLjczNzA2NiAtMTAuODEyNSwwLjM0Mzc1IEMgLTYzLjAxMzE3MSwtNjQuMzMwNDYxIC02Ni41LC02NS41IC02Ni41LC02NS41IGEgMS42MTQ0MDU2LDEuNjE0NDA1NiAwIDAgMCAtMC43ODEyNSwtMC4wOTM3NSB6IG0gLTExLjIwNzg5MiwtOC40MzcwMDUgYyAtOC40MDcyMjEsMC4wNTYwNiAtMTEuNTM5NDI1LDIuNjQ1MDU3IC0xMS41Mzk0MjUsMi42NDUwNTcgbCAwLDYyLjc4Mzc3NTUgYyAwLDAgMy4wNTg1OCwtMi42NDE1MTY1IDEyLjkwNTU1NCwtMi4yMzgxMjU1IDkuODQ2OTc0LDAuNDAzMzkxIDExLjg3ODI1NSwzLjg1NTI3NjUgMjMuOTc5OTE0LDQuMDk4Mzg1NSAxMi4xMDE2NTksMC4yNDMxMDkgMTUuMTQzNjc5LC0xLjg2MDI2IDE1LjE0MzY3OSwtMS44NjAyNiBsIDAuMTc0Mzk5LC02NC4wMDQ1NzA1IGMgMCwwIC01LjQ0NjEzMywxLjU0MTM5MiAtMTYuMDQ0NzQyLDEuNjI3NzI3IC0xMC41OTg2MDksMC4wODYzNCAtMTMuMTQ2MDc0LC0yLjY5NjE0NCAtMjIuODc1Mzg1LC0zLjAyMjkyMiAtMC42MDgwODIsLTAuMDIwNDIgLTEuMTgzNTEyLC0wLjAzMjggLTEuNzQzOTk0LC0wLjAyOTA3IHogbSA3LjAzNDEwOSw0LjA5ODM4NiBjIDAsMCA1LjA5NDM3NiwxLjY4NDAyIDE0LjUwNDIxNCwyLjE1MDkyNSA3Ljk1MzAxOSwwLjM5NDYyIDE1LjkyODQ3NywtMC43ODQ3OTcgMTUuOTI4NDc3LC0wLjc4NDc5NyBsIDAsNTYuODgzMjYzIGMgMCwwIC00LjAzNjY2NSwyLjExNTg1NDkgLTE0LjEyNjM1LDEuMzk1MTk1IC03LjgxOTMzMSwtMC41NTg0OTkgLTE2LjQyMjYwOCwtMy41MTcwNTQgLTE2LjQyMjYwOCwtMy41MTcwNTQgbCAwLjExNjI2NywtNTYuMTI3NTMyIHogbSAtNC45MTIyNDksMS40ODIzOTQgYSAxLjYyNzcyNzUsMS42Mjc3Mjc1IDAgMCAxIDAsMy4yNTU0NTUgYyAwLDAgLTIuNjM0OTg1LDAuMDEzNTMgLTQuMjQzNzE5LDAuMTc0NCAtMi43MDEwMjUsMC4yNzAxMDMgLTQuNTM0MzgzLDEuMjQ5ODYyIC00LjUzNDM4MywxLjI0OTg2MiBhIDEuNjI1MTk1NSwxLjYyNTE5NTUgMCAxIDEgLTEuNTExNDYyLC0yLjg3NzU5IGMgMCwwIDIuMzkxNjA1LC0xLjI2NTIxIDUuNzI2MTEzLC0xLjU5ODY2MSAxLjkyNjgwMSwtMC4xOTI2OTkgNC41NjM0NTEsLTAuMjAzNDY2IDQuNTYzNDUxLC0wLjIwMzQ2NiB6IG0gLTEuNTY5NTk1LDguMDIyMzcyIGMgMC44OTk3NzUsLTAuMDIyNzkgMS41Njk1OTUsMCAxLjU2OTU5NSwwIGEgMS42MjUsMS42MjUgMCAwIDEgMCwzLjIyNjM4OCBjIDAsMCAtMi42MzQ5ODUsMC4wMTM1MiAtNC4yNDM3MTksMC4xNzQzOTkgLTIuNzAxMDI1LDAuMjcwMTA0IC00LjUzNDM4MywxLjI0OTg2MyAtNC41MzQzODMsMS4yNDk4NjMgYSAxLjYyNTE5NTUsMS42MjUxOTU1IDAgMCAxIC0xLjUxMTQ2MiwtMi44Nzc1OSBjIDAsMCAyLjM5MTYwNSwtMS4yNjUyMSA1LjcyNjExMywtMS41OTg2NjEgMC45NjM0MDEsLTAuMDk2MzUgMi4wOTQwODEsLTAuMTUxNjEyIDIuOTkzODU2LC0wLjE3NDM5OSB6IG0gMS41Njk1OTUsNy45OTMzMDQgYSAxLjYyNzcyNzUsMS42Mjc3Mjc1IDAgMCAxIDAsMy4yNTU0NTUgYyAwLDAgLTIuNjM0OTg1LC0wLjAxNTU0IC00LjI0MzcxOSwwLjE0NTMzMyAtMi43MDEwMjUsMC4yNzAxMDMgLTQuNTM0MzgzLDEuMjQ5ODYyIC00LjUzNDM4MywxLjI0OTg2MiBhIDEuNjI1MTk1MiwxLjYyNTE5NTIgMCAwIDEgLTEuNTExNDYyLC0yLjg3NzU4OSBjIDAsMCAyLjM5MTYwNSwtMS4yNjUyMTEgNS43MjYxMTMsLTEuNTk4NjYxIDEuOTI2ODAxLC0wLjE5MjcgNC41NjM0NTEsLTAuMTc0NCA0LjU2MzQ1MSwtMC4xNzQ0IHoiCiAgICAgICAgICAgICBpbmtzY2FwZTpjb25uZWN0b3ItY3VydmF0dXJlPSIwIiAvPgogICAgICAgIDwvZz4KICAgICAgICA8ZwogICAgICAgICAgIHN0eWxlPSJmb250LXNpemU6MzJweDtmb250LXN0eWxlOm5vcm1hbDtmb250LXZhcmlhbnQ6bm9ybWFsO2ZvbnQtd2VpZ2h0Om5vcm1hbDtmb250LXN0cmV0Y2g6bm9ybWFsO2xpbmUtaGVpZ2h0OjEyNSU7bGV0dGVyLXNwYWNpbmc6LTEuOTkwMDAwMDFweDt3b3JkLXNwYWNpbmc6MHB4O2ZpbGw6I2ZhZmFmYTtzdHJva2U6bm9uZTtmb250LWZhbWlseTpCaXR0ZXI7LWlua3NjYXBlLWZvbnQtc3BlY2lmaWNhdGlvbjpCaXR0ZXIiCiAgICAgICAgICAgaWQ9InRleHQ1Mjk4Ij4KICAgICAgICAgIDxwYXRoCiAgICAgICAgICAgICBkPSJtIDYzLjM4MDIzMiwxMDM4Ljg1MjIgMCwtMi41OTIgMS4wNTYsLTAuMDk2IGMgMC42MTg2NjQsLTAuMDY0IDAuOTI3OTk3LC0wLjM2MjcgMC45MjgsLTAuODk2IGwgMCwtMTQuODggLTEuODI0LC0wLjA5NiAwLC0yLjcyIDguNzM2LDAgYyAyLjQ3NDY1NCwwIDQuMzczMzE5LDAuNDU4NyA1LjY5NiwxLjM3NiAxLjMyMjY0OSwwLjkxNzMgMS45ODM5ODIsMi40MjEzIDEuOTg0LDQuNTEyIC0xLjhlLTUsMS40NTA3IC0wLjM4NDAxOCwyLjY0NTMgLTEuMTUyLDMuNTg0IC0wLjc0NjY4MywwLjkzODcgLTEuNjQyNjgyLDEuNjIxMyAtMi42ODgsMi4wNDggMC43Njc5ODUsMC4yNzczIDEuMzc1OTg1LDAuOTI4IDEuODI0LDEuOTUyIGwgMi4zMDQsNS4wMjQgMS44MjQsMC4wNjQgMCwyLjcyIC03LjkwNCwwIDAsLTIuNTkyIDAuOTI4LC0wLjA5NiBjIDAuNDkwNjUzLC0wLjA2NCAwLjczNTk4NiwtMC4yNTYgMC43MzYsLTAuNTc2IC0xLjRlLTUsLTAuMTI4IC0wLjA0MjY4LC0wLjI3NzQgLTAuMTI4LC0wLjQ0OCBsIC0xLjUwNCwtMy4yIGMgLTAuMjM0Njc5LC0wLjUzMzQgLTAuNTAxMzQ1LC0wLjkwNjcgLTAuOCwtMS4xMiAtMC4yNzczNDQsLTAuMjM0NyAtMC42ODI2NzcsLTAuMzUyIC0xLjIxNiwtMC4zNTIgbCAtMi45MTIsMCAwLDUuNTY4IDIuMDgsMC4wOTYgMCwyLjcyIC03Ljk2OCwwIG0gNS44ODgsLTExLjQyNCAyLjc4NCwwIGMgMi42MjM5ODcsMCAzLjkzNTk4NiwtMS4xNzMzIDMuOTM2LC0zLjUyIC0xLjRlLTUsLTEuMzQ0IC0wLjM1MjAxNCwtMi4yMTg3IC0xLjA1NiwtMi42MjQgLTAuNjgyNjc5LC0wLjQwNTMgLTEuNzkyMDExLC0wLjYwOCAtMy4zMjgsLTAuNjA4IGwgLTIuMzM2LDAgMCw2Ljc1MiIKICAgICAgICAgICAgIHN0eWxlPSJmaWxsOiNmYWZhZmE7Zm9udC1mYW1pbHk6QnJlZSBTZXJpZjstaW5rc2NhcGUtZm9udC1zcGVjaWZpY2F0aW9uOkJyZWUgU2VyaWYgQm9sZCIKICAgICAgICAgICAgIGlkPSJwYXRoMzA2OCIgLz4KICAgICAgICAgIDxwYXRoCiAgICAgICAgICAgICBkPSJtIDkwLjMxMDA5NCwxMDIyLjI3NjIgYyAxLjU5OTk4OSwwIDIuODY5MzIxLDAuMzk0NyAzLjgwOCwxLjE4NCAwLjkzODY1MiwwLjc2OCAxLjQwNzk4NSwxLjg1NiAxLjQwOCwzLjI2NCAtMS41ZS01LDAuOTM4NyAtMC4yMDI2ODEsMS43NzA2IC0wLjYwOCwyLjQ5NiAtMC40MDUzNDcsMC43MDQgLTAuOTA2NjgsMS4yNTg2IC0xLjUwNCwxLjY2NCAtMC41OTczNDUsMC40MDUzIC0xLjMyMjY3OCwwLjczNiAtMi4xNzYsMC45OTIgLTEuNDI5MzQyLDAuNDI2NiAtMy4wNDAwMDcsMC42NCAtNC44MzIsMC42NCAwLjA2Mzk5LDEuMTMwNiAwLjQxNTk5NCwyLjA0OCAxLjA1NiwyLjc1MiAwLjYzOTk5MywwLjY4MjYgMS42MjEzMjUsMS4wMjQgMi45NDQsMS4wMjQgMS4zMjI2NTYsMCAyLjY0NTMyMSwtMC40Njk0IDMuOTY4LC0xLjQwOCBsIDEuMjE2LDIuNTkyIGMgLTAuNDI2NjgxLDAuMzg0IC0xLjE1MjAxNCwwLjc3ODYgLTIuMTc2LDEuMTg0IC0xLjAwMjY3OCwwLjQwNTMgLTIuMTU0Njc3LDAuNjA4IC0zLjQ1NiwwLjYwOCAtMi42MDI2NzMsMCAtNC41MTIwMDUsLTAuNzE0NyAtNS43MjgsLTIuMTQ0IC0xLjIxNjAwMiwtMS40NTA3IC0xLjgyNDAwMiwtMy40MzQ3IC0xLjgyNCwtNS45NTIgLTJlLTYsLTIuNTE3NCAwLjY5MzMzMSwtNC42MjkzIDIuMDgsLTYuMzM2IDEuMzg2NjYyLC0xLjcwNjcgMy4zMjc5OTMsLTIuNTYgNS44MjQsLTIuNTYgbSAtMS40NzIsNy4zMjggYyAwLjc4OTMyNSwtMC4xNDk0IDEuNTE0NjU3LC0wLjQ1ODcgMi4xNzYsLTAuOTI4IDAuNjYxMzIyLC0wLjQ5MDcgMC45OTE5ODksLTEuMDY2NyAwLjk5MiwtMS43MjggLTEuMWUtNSwtMS4zMDEzIC0wLjY0MDAxMSwtMS45NTIgLTEuOTIsLTEuOTUyIC0xLjE5NDY3NSwwIC0yLjExMjAwNywwLjQ4IC0yLjc1MiwxLjQ0IC0wLjY0MDAwNiwwLjkzODcgLTAuOTkyMDA2LDIuMDY5MyAtMS4wNTYsMy4zOTIgMC45Mzg2NiwtMC4wMjEgMS43OTE5OTMsLTAuMDk2IDIuNTYsLTAuMjI0IgogICAgICAgICAgICAgc3R5bGU9ImZpbGw6I2ZhZmFmYTtmb250LWZhbWlseTpCcmVlIFNlcmlmOy1pbmtzY2FwZS1mb250LXNwZWNpZmljYXRpb246QnJlZSBTZXJpZiBCb2xkIgogICAgICAgICAgICAgaWQ9InBhdGgzMDcwIiAvPgogICAgICAgICAgPHBhdGgKICAgICAgICAgICAgIGQ9Im0gMTEwLjg2MzIsMTAyMy4zOTYyIDAsMTEuOTA0IGMgLTFlLTUsMC4zNDEzIDAuMDUzMywwLjU3NiAwLjE2LDAuNzA0IDAuMTI3OTksMC4xMjggMC4zNDEzMiwwLjIwMjYgMC42NCwwLjIyNCBsIDEuMDI0LDAuMDY0IDAsMi41NiAtNS4wODgsMCAwLC0xLjg1NiAtMC4wOTYsLTAuMDMyIGMgLTEuMDY2NjgsMS41MzYgLTIuNTI4MDEsMi4zMDQgLTQuMzg0LDIuMzA0IC0yLjE3NiwwIC0zLjc4NjY2OSwtMC42OTM0IC00LjgzMTk5OSwtMi4wOCAtMS4wNDUzMzUsLTEuMzg2NyAtMS41NjgwMDEsLTMuMjg1NCAtMS41NjgsLTUuNjk2IC0xMGUtNywtMi45MDE0IDAuNzAzOTk4LC01LjE2MjcgMi4xMTIsLTYuNzg0IDEuNDA3OTk5LC0xLjYyMTMgMy41MTk5ODksLTIuNDMyIDYuMzM1OTk5LC0yLjQzMiAxLjgxMzMyLDAgMy43MTE5OSwwLjM3MzMgNS42OTYsMS4xMiBtIC0zLjcxMiwxMC4zNjggMCwtOC4yODggYyAtMC41OTczNCwtMC4yNzczIC0xLjQxODY4LC0wLjQxNiAtMi40NjQsLTAuNDE2IC0xLjQyOTM0LDAgLTIuNDY0MDEsMC41NzYgLTMuMTA0LDEuNzI4IC0wLjY0LDEuMTUyIC0wLjk2LDIuNjc3MyAtMC45Niw0LjU3NiAwLDMuNDU2IDEuMTA5MzMsNS4xODQgMy4zMjgsNS4xODQgMC45Mzg2NiwwIDEuNzA2NjYsLTAuMjc3NCAyLjMwNCwtMC44MzIgMC41OTczMiwtMC41NzYgMC44OTU5OSwtMS4yMjY3IDAuODk2LC0xLjk1MiIKICAgICAgICAgICAgIHN0eWxlPSJmaWxsOiNmYWZhZmE7Zm9udC1mYW1pbHk6QnJlZSBTZXJpZjstaW5rc2NhcGUtZm9udC1zcGVjaWZpY2F0aW9uOkJyZWUgU2VyaWYgQm9sZCIKICAgICAgICAgICAgIGlkPSJwYXRoMzA3MiIgLz4KICAgICAgICAgIDxwYXRoCiAgICAgICAgICAgICBkPSJtIDEyMS4xMjA2OSwxMDIyLjI3NjIgYyAwLjkxNzMzLDAgMS43OTE5OSwwLjEyOCAyLjYyNCwwLjM4NCBsIDAsLTMuMjMyIGMgLTFlLTUsLTAuNDY5MyAtMC4yNzczNCwtMC43MjUzIC0wLjgzMiwtMC43NjggbCAtMS4zNzYsLTAuMDk2IDAsLTIuNTI4IDUuOTUyLDAgMCwxOS40NTYgYyAwLjAyMTMsMC40OTA2IDAuMjg3OTksMC43MzYgMC44LDAuNzM2IGwgMS4xMiwwLjA2NCAwLDIuNTYgLTUuMTg0LDAgMCwtMS44ODggLTAuMDk2LC0wLjAzMiBjIC0wLjk2MDAxLDEuNTU3MyAtMi40MTA2NywyLjMzNiAtNC4zNTIsMi4zMzYgLTIuNDMyLDAgLTQuMTM4NjcsLTAuODEwNyAtNS4xMiwtMi40MzIgLTAuODk2LC0xLjQ3MiAtMS4zNDQsLTMuMjc0NyAtMS4zNDQsLTUuNDA4IDAsLTIuNzczNCAwLjY4MjY3LC00Ljk5MiAyLjA0OCwtNi42NTYgMS4zODY2NiwtMS42NjQgMy4zMDY2NiwtMi40OTYgNS43NiwtMi40OTYgbSAyLjYyNCwxMS41ODQgMCwtOC4yODggYyAtMC43NjgwMSwtMC4zNDEzIC0xLjU3ODY3LC0wLjUxMiAtMi40MzIsLTAuNTEyIC0xLjQwODAxLDAgLTIuNDQyNjcsMC41NjUzIC0zLjEwNCwxLjY5NiAtMC42NCwxLjEzMDcgLTAuOTYsMi41NzA2IC0wLjk2LDQuMzIgMCwzLjU4NCAxLjE1Miw1LjM3NiAzLjQ1Niw1LjM3NiAwLjg3NDY2LDAgMS41OTk5OSwtMC4yNDU0IDIuMTc2LC0wLjczNiAwLjU3NTk5LC0wLjUxMiAwLjg2Mzk5LC0xLjEzMDcgMC44NjQsLTEuODU2IgogICAgICAgICAgICAgc3R5bGU9ImZpbGw6I2ZhZmFmYTtmb250LWZhbWlseTpCcmVlIFNlcmlmOy1pbmtzY2FwZS1mb250LXNwZWNpZmljYXRpb246QnJlZSBTZXJpZiBCb2xkIgogICAgICAgICAgICAgaWQ9InBhdGgzMDc0IiAvPgogICAgICAgICAgPHBhdGgKICAgICAgICAgICAgIGQ9Im0gMTQxLjg5MjE5LDEwMzYuMzMyMiBjIDAsMCAtMS40ODQsMC41NiAtMi4yNjgsMC41NiAtMC43ODQsMCAtMS4wOTIsLTAuMzkyIC0xLjA5MiwtMS40IDAsLTAuNDQ4IDAuMDU2LC0xLjAzNiAwLjE2OCwtMS43NjQgbCAxLjIwNCwtNy40NzYgMy44NjQsMCAwLjMzNiwtMi4xIC0zLjg2NCwwIDAuNjcyLC00LjA4OCAtMi43NzIsMC41NiAtMC41NiwzLjUyOCAtMi44LDAuMjggLTAuMzA4LDEuODIgMi43NzIsMCAtMS4yMzIsNy43NTYgYyAtMC4xMTIsMC42NDQgLTAuMTY4LDEuMjYgLTAuMTY4LDEuNzkyIDAsMi4yMTIgMC45MjQsMy4zMzIgMi44MjgsMy4zMzIgMS41NjgsMCAzLjY2OCwtMS4yODggMy42NjgsLTEuMjg4IGwgLTAuNDQ4LC0xLjUxMiIKICAgICAgICAgICAgIHN0eWxlPSJmb250LXNpemU6MjhweDtmb250LXN0eWxlOml0YWxpYztmb250LXdlaWdodDpub3JtYWw7ZmlsbDojZmFmYWZhO2ZvbnQtZmFtaWx5OkJpdHRlcjstaW5rc2NhcGUtZm9udC1zcGVjaWZpY2F0aW9uOkJpdHRlciBJdGFsaWMiCiAgICAgICAgICAgICBpZD0icGF0aDMwNzYiIC8+CiAgICAgICAgICA8cGF0aAogICAgICAgICAgICAgZD0ibSAxNTAuNTcyMjUsMTAxNy4yOTIyIC01LjEyNCwwLjE0IC0wLjI1MiwxLjU0IDIuMzUyLDAuNTYgLTMuMDgsMTkuMzIgMi42NiwwIDAuOTI0LC01LjA0IGMgMCwwIDIuMjEyLC03LjcgNS44NTIsLTcuNyAxLjExOTk5LDAgMS40NTYsMC44MTIgMS40NTYsMS44NDggMCwwLjM5MiAtMC4wNTYsMC44MTIgLTAuMTEyLDEuMjMyIGwgLTEuNTk2LDkuNjYgNS4xMjQsLTAuMjggMC4yNTIsLTEuNTQgLTIuMzUyLC0wLjQyIDEuMjYsLTcuODQgYyAwLjA4NCwtMC41ODggMC4xNCwtMS4xNDggMC4xNCwtMS42NTIgMCwtMi4wMTYgLTAuODEyMDEsLTMuMzg4IC0zLjA1MiwtMy4zODggLTQuMjU2LDAgLTYuNDk2LDUuNDA0IC02LjYwOCw1LjcxMiBsIDIuMTU2LC0xMi4xNTIiCiAgICAgICAgICAgICBzdHlsZT0iZm9udC1zaXplOjI4cHg7Zm9udC1zdHlsZTppdGFsaWM7Zm9udC13ZWlnaHQ6bm9ybWFsO2ZpbGw6I2ZhZmFmYTtmb250LWZhbWlseTpCaXR0ZXI7LWlua3NjYXBlLWZvbnQtc3BlY2lmaWNhdGlvbjpCaXR0ZXIgSXRhbGljIgogICAgICAgICAgICAgaWQ9InBhdGgzMDc4IiAvPgogICAgICAgICAgPHBhdGgKICAgICAgICAgICAgIGQ9Im0gMTcwLjY5NzU1LDEwMzUuNjMyMiBjIDAsMCAtMi41NDgsMS4yNiAtNC41OTIsMS4yNiAtMi4xLDAgLTMuMDgsLTAuOTI0IC0zLjA4LC0yLjkxMiAwLC0wLjM2NCAwLjAyOCwtMC43ODQgMC4wODQsLTEuMjA0IDUuNzk2LDAgOS44MjgsLTIuMTg0IDkuODI4LC01LjQwNCAwLC0yLjIxMiAtMS43OTIsLTMuNjQgLTQuNjIsLTMuNjQgLTQuNDUxOTksMCAtOC4wOTIsNC41NjQgLTguMDkyLDEwLjM2IDAsMy4wOCAxLjk2LDUuMDQgNS4wNCw1LjA0IDMuMzA0LDAgNi4yNzIsLTIuMDcyIDYuMjcyLC0yLjA3MiBsIC0wLjg0LC0xLjQyOCBtIC03LjMzNiwtNC44MTYgYyAwLjcyOCwtMi45NCAyLjc3MiwtNC45ODQgNC44MTYsLTQuOTg0IDEuNDI4LDAgMi4xLDAuNTg4IDIuMSwxLjgyIDAsMS44NDggLTIuOTQsMy4xNjQgLTYuOTE2LDMuMTY0IgogICAgICAgICAgICAgc3R5bGU9ImZvbnQtc2l6ZToyOHB4O2ZvbnQtc3R5bGU6aXRhbGljO2ZvbnQtd2VpZ2h0Om5vcm1hbDtmaWxsOiNmYWZhZmE7Zm9udC1mYW1pbHk6Qml0dGVyOy1pbmtzY2FwZS1mb250LXNwZWNpZmljYXRpb246Qml0dGVyIEl0YWxpYyIKICAgICAgICAgICAgIGlkPSJwYXRoMzA4MCIgLz4KICAgICAgICAgIDxwYXRoCiAgICAgICAgICAgICBkPSJtIDE3Ny42NDMwNSwxMDM4Ljg1MjIgMCwtMi41OTIgMS4wNTYsLTAuMDk2IGMgMC42MTg2NywtMC4wNjQgMC45MjgsLTAuMzYyNyAwLjkyOCwtMC44OTYgbCAwLC0xNC44OCAtMS44MjQsLTAuMDk2IDAsLTIuNzIgOC43NjgsMCBjIDMuMTM1OTksMCA1LjU3ODY1LDAuODMyIDcuMzI4LDIuNDk2IDEuNzcwNjUsMS42NjQgMi42NTU5OCw0LjEyOCAyLjY1Niw3LjM5MiAtMmUtNSwyLjAyNjYgLTAuMjY2NjgsMy43OTczIC0wLjgsNS4zMTIgLTAuNTMzMzUsMS40OTMzIC0xLjI1ODY4LDIuNjY2NiAtMi4xNzYsMy41MiAtMS44MzQ2OCwxLjcwNjYgLTQuMTE3MzQsMi41NiAtNi44NDgsMi41NiBsIC05LjA4OCwwIG0gNS44ODgsLTE4LjE3NiAwLDE1LjEwNCAzLjI2NCwwIGMgMS44MzQ2NiwwIDMuMjYzOTksLTAuNjYxNCA0LjI4OCwtMS45ODQgMS4wMjM5OSwtMS4zMjI3IDEuNTM1OTksLTMuMjQyNyAxLjUzNiwtNS43NiAtMTBlLTYsLTQuOTA2NyAtMi4wODAwMSwtNy4zNiAtNi4yNCwtNy4zNiBsIC0yLjg0OCwwIgogICAgICAgICAgICAgc3R5bGU9ImZpbGw6I2ZhZmFmYTtmb250LWZhbWlseTpCcmVlIFNlcmlmOy1pbmtzY2FwZS1mb250LXNwZWNpZmljYXRpb246QnJlZSBTZXJpZiBCb2xkIgogICAgICAgICAgICAgaWQ9InBhdGgzMDgyIiAvPgogICAgICAgICAgPHBhdGgKICAgICAgICAgICAgIGQ9Im0gMjA1LjYyNjU5LDEwMzYuNTE2MiBjIDIuMzI1MzIsMCAzLjQ4Nzk4LC0xLjg3NzQgMy40ODgsLTUuNjMyIC0yZS01LC0xLjg5ODcgLTAuMjY2NjgsLTMuMzM4NyAtMC44LC00LjMyIC0wLjUxMjAxLC0wLjk4MTMgLTEuMzg2NjgsLTEuNDcyIC0yLjYyNCwtMS40NzIgLTEuMjE2MDEsMCAtMi4xMTIwMSwwLjQ2OTMgLTIuNjg4LDEuNDA4IC0wLjU3NjAxLDAuOTM4NyAtMC44NjQwMSwyLjIxODYgLTAuODY0LDMuODQgLTFlLTUsMy4wMDggMC41NTQ2Niw0Ljg5NiAxLjY2NCw1LjY2NCAwLjQ5MDY2LDAuMzQxMyAxLjA5ODY2LDAuNTEyIDEuODI0LDAuNTEyIG0gLTcuMzYsLTUuNzI4IGMgMCwtMS41Nzg3IDAuMjM0NjYsLTIuOTQ0IDAuNzA0LC00LjA5NiAwLjQ2OTMzLC0xLjE3MzMgMS4wOTg2NiwtMi4wNjkzIDEuODg4LC0yLjY4OCAxLjUxNDY2LC0xLjE1MiAzLjE4OTMyLC0xLjcyOCA1LjAyNCwtMS43MjggMS4yNzk5OSwwIDIuMzU3MzIsMC4yMTMzIDMuMjMyLDAuNjQgMC44OTU5OCwwLjQwNTMgMS41ODkzMiwwLjg4NTMgMi4wOCwxLjQ0IDAuNTExOTgsMC41MzMzIDAuOTM4NjUsMS4zMjI3IDEuMjgsMi4zNjggMC4zNjI2NSwxLjAyNCAwLjU0Mzk4LDIuMjQgMC41NDQsMy42NDggLTJlLTUsMi45NDQgLTAuNzE0NjksNS4xNzMzIC0yLjE0NCw2LjY4OCAtMS40MjkzNSwxLjUxNDYgLTMuMjY0MDEsMi4yNzIgLTUuNTA0LDIuMjcyIC0yLjIxODY4LDAgLTMuOTU3MzQsLTAuNzE0NyAtNS4yMTYsLTIuMTQ0IC0xLjI1ODY3LC0xLjQ1MDcgLTEuODg4LC0zLjU4NCAtMS44ODgsLTYuNCIKICAgICAgICAgICAgIHN0eWxlPSJmaWxsOiNmYWZhZmE7Zm9udC1mYW1pbHk6QnJlZSBTZXJpZjstaW5rc2NhcGUtZm9udC1zcGVjaWZpY2F0aW9uOkJyZWUgU2VyaWYgQm9sZCIKICAgICAgICAgICAgIGlkPSJwYXRoMzA4NCIgLz4KICAgICAgICAgIDxwYXRoCiAgICAgICAgICAgICBkPSJtIDIxOC40Mjg0NiwxMDMwLjYyODIgYyAtMWUtNSwxLjgxMzMgMC4zNDEzMywzLjIyMTMgMS4wMjQsNC4yMjQgMC42ODI2NiwxLjAwMjYgMS42NjM5OSwxLjUwNCAyLjk0NCwxLjUwNCAxLjMwMTMyLDAgMi41ODEzMiwtMC40NTg3IDMuODQsLTEuMzc2IGwgMS4zNzYsMi40NjQgYyAtMS41MTQ2OCwxLjIzNzMgLTMuNDEzMzUsMS44NTYgLTUuNjk2LDEuODU2IC0yLjI4MjY4LDAgLTQuMDg1MzQsLTAuNzE0NyAtNS40MDgsLTIuMTQ0IC0xLjMwMTM0LC0xLjQ1MDcgLTEuOTUyLC0zLjU4NCAtMS45NTIsLTYuNCAwLC0yLjgxNiAwLjc0NjY2LC00LjkyOCAyLjI0LC02LjMzNiAxLjUxNDY2LC0xLjQyOTMgMy4yMTA2NiwtMi4xNDQgNS4wODgsLTIuMTQ0IDEuODk4NjUsMCAzLjY1ODY1LDAuNDM3MyA1LjI4LDEuMzEyIGwgMCw0LjE2IC0yLjk0NCwwLjIyNCAwLC0xLjUzNiBjIC0xZS01LC0wLjU3NiAtMC4yMTMzNSwtMC45MjggLTAuNjQsLTEuMDU2IC0wLjQwNTM1LC0wLjE0OTMgLTAuODMyMDEsLTAuMjI0IC0xLjI4LC0wLjIyNCAtMi41ODEzNCwwIC0zLjg3MjAxLDEuODI0IC0zLjg3Miw1LjQ3MiIKICAgICAgICAgICAgIHN0eWxlPSJmaWxsOiNmYWZhZmE7Zm9udC1mYW1pbHk6QnJlZSBTZXJpZjstaW5rc2NhcGUtZm9udC1zcGVjaWZpY2F0aW9uOkJyZWUgU2VyaWYgQm9sZCIKICAgICAgICAgICAgIGlkPSJwYXRoMzA4NiIgLz4KICAgICAgICAgIDxwYXRoCiAgICAgICAgICAgICBkPSJtIDIzNi43NDUyMSwxMDI1LjE4ODIgYyAtMC41MTIwMSwtMC4xOTIgLTEuMTMwNjgsLTAuMjg4IC0xLjg1NiwtMC4yODggLTAuNzI1MzQsMCAtMS4zMTIwMSwwLjE3MDcgLTEuNzYsMC41MTIgLTAuNDI2NjgsMC4zMiAtMC42NDAwMSwwLjcyNTMgLTAuNjQsMS4yMTYgLTFlLTUsMC40NjkzIDAuMDc0NywwLjg0MjcgMC4yMjQsMS4xMiAwLjE3MDY2LDAuMjU2IDAuNDI2NjYsMC40OCAwLjc2OCwwLjY3MiAwLjUzMzMyLDAuMjc3MyAxLjE3MzMyLDAuNTIyNiAxLjkyLDAuNzM2IDAuNzQ2NjUsMC4xOTIgMS4zMDEzMiwwLjM1MiAxLjY2NCwwLjQ4IDAuMzYyNjUsMC4xMDY2IDAuODEwNjUsMC4yOTg2IDEuMzQ0LDAuNTc2IDAuNTU0NjUsMC4yNzczIDAuOTcwNjUsMC41NzYgMS4yNDgsMC44OTYgMC43NDY2NSwwLjc4OTMgMS4xMTk5OCwxLjgwMjYgMS4xMiwzLjA0IC0yZS01LDEuNiAtMC41ODY2OCwyLjg1ODYgLTEuNzYsMy43NzYgLTEuMTUyMDEsMC44OTYgLTIuNjI0MDEsMS4zNDQgLTQuNDE2LDEuMzQ0IC0yLjYwMjY4LDAgLTQuNTY1MzQsLTAuMzMwNyAtNS44ODgsLTAuOTkyIGwgMCwtNC40NDggMi44OCwtMC4yMjQgMCwxLjUzNiBjIC0xZS01LDAuOTM4NiAwLjg5NTk5LDEuNDA4IDIuNjg4LDEuNDA4IDEuNzkxOTksMCAyLjY4Nzk5LC0wLjY1MDcgMi42ODgsLTEuOTUyIC0xZS01LC0wLjQ2OTQgLTAuMTYwMDEsLTAuODUzNCAtMC40OCwtMS4xNTIgLTAuMjk4NjgsLTAuMjk4NyAtMC41OTczNSwtMC41MDE0IC0wLjg5NiwtMC42MDggLTAuMjk4NjgsLTAuMTA2NyAtMC42NjEzNCwtMC4yMTM0IC0xLjA4OCwtMC4zMiAtMC40MDUzNCwtMC4xMDY3IC0wLjgxMDY4LC0wLjIxMzQgLTEuMjE2LC0wLjMyIC0wLjM4NDAxLC0wLjEwNjcgLTAuODEwNjgsLTAuMjQ1NCAtMS4yOCwtMC40MTYgLTAuNDQ4MDEsLTAuMTkyIC0wLjk0OTM0LC0wLjQ1ODcgLTEuNTA0LC0wLjggLTEuMDg4MDEsLTAuNzA0IC0xLjYzMjAxLC0xLjg3NzQgLTEuNjMyLC0zLjUyIC0xZS01LC0xLjY2NCAwLjU4NjY2LC0yLjk0NCAxLjc2LC0zLjg0IDEuMTczMzMsLTAuODk2IDIuNjQ1MzIsLTEuMzQ0IDQuNDE2LC0xLjM0NCAxLjc5MTk5LDAgMy41NjI2NSwwLjQyNjcgNS4zMTIsMS4yOCBsIDAsMy44NCAtMi44OCwwLjIyNCAwLC0xLjM0NCBjIC0xZS01LC0wLjUzMzMgLTAuMjQ1MzUsLTAuODk2IC0wLjczNiwtMS4wODgiCiAgICAgICAgICAgICBzdHlsZT0iZmlsbDojZmFmYWZhO2ZvbnQtZmFtaWx5OkJyZWUgU2VyaWY7LWlua3NjYXBlLWZvbnQtc3BlY2lmaWNhdGlvbjpCcmVlIFNlcmlmIEJvbGQiCiAgICAgICAgICAgICBpZD0icGF0aDMwODgiIC8+CiAgICAgICAgPC9nPgogICAgICA8L2c+CiAgICA8L2c+CiAgPC9nPgo8L3N2Zz4K" />
+          </a>
         </div>
       </div>
-    </section>
-    <!-- END projects list -->
-  {% endcache %}
-  {% endif %}
+    </header>
 
-  <!-- Funding and Contributing -->
-  <section>
-    <h2>{% trans "Read the Docs is funded by the community" %}</h2>
-    <p>
+    <main role="main">
+      <div class="container">
 
-    {% url "advertising" as advertising_url %}
-    {% url "donate" as sponsors_url %}
-    {% url "gold_detail" as gold_detail %}
+        <section>
+          <h1>{% trans "Technical documentation lives here" %}</h1>
+          <p class="lead">
+            {% blocktrans trimmed %}
+            Read the Docs simplifies software documentation by automating building,
+            versioning, and hosting of your docs for you.
+            {% endblocktrans %}
+          </p>
+        </section>
 
-    {% blocktrans trimmed %}
-    Read the Docs is a huge resource that millions of developers rely on
-    for software documentation. It would not be possible without the
-    support of our
-    <a href="{{ sponsors_url }}">sponsors</a>,
-    <a href="{{ advertising_url }}">advertisers</a>,
-    and <a href="{{ gold_detail }}">readers like you</a>.
-    {% endblocktrans %}
-    </p>
+        <!-- Features -->
+        <section>
+          <div class="row my-5">
+            <div class="col-sm">
+              <h3>Free docs hosting</h3>
+               <p>
+                {% with projects_count_intcomma=projects_count|intcomma %}
+                {% blocktrans trimmed %}
+                We will host your documentation for free forever.
+                There are no tricks. We help {{ projects_count_intcomma }} open source projects
+                share their docs.
+                {% endblocktrans %}
+                {% endwith %}
+              </p>
+            </div>
 
-    <p>
-      {% blocktrans trimmed %}
-      Read the Docs is <strong>community supported</strong>.
-      It depends on users like you to contribute to development, support, and operations.
-      You can learn more about how to <a href="https://docs.readthedocs.io/en/latest/contribute.html">contribute</a> in our docs.
-      Thanks so much to our wonderful <a href="https://docs.readthedocs.io/en/latest/team.html">community team</a> who helps us run the site.
-      Read the Docs wouldn't be possible without them.
-      {% endblocktrans %}
-    </p>
+            <div class="col-sm">
+              <h3>Webhooks</h3>
+               <p>
+                {% blocktrans trimmed %}
+                Whenever you push code to your favorite version control system,
+                whether that is Git, Mercurial, Bazaar, or Subversion, we will
+                automatically build your docs so your code and documentation are
+                never out of sync.
+                {% endblocktrans %}
+              </p>
+            </div>
+          </div>
 
-    <p>
-      {% blocktrans trimmed %}
-      Hosting for the project is graciously provided by <a href="https://azure.microsoft.com/">Microsoft Azure</a>.
-      {% endblocktrans %}
-    </p>
-  </section>
-{% endblock %}
+          <div class="row my-5">
+            <div class="col-sm">
+              <h3>Multiple formats</h3>
+               <p>
+                {% blocktrans trimmed %}
+                Of course we build and host your docs for the web, but they are
+                also vieweable as PDFs, as single page HTML, and for eReaders.
+                No additional configuration is required.
+                {% endblocktrans %}
+              </p>
+            </div>
+
+            <div class="col-sm">
+              <h3>Multiple versions</h3>
+               <p>
+                {% blocktrans trimmed %}
+                We can host and build multiple versions of your docs so having a
+                1.0 version of your docs and a 2.0 version of your docs is as easy
+                as having a separate branch or tag in your version control system.
+                {% endblocktrans %}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Getting Started -->
+        <section class="my-5">
+          <p class="text-center">
+            <a href="https://docs.readthedocs.io/en/latest/getting_started.html" class="btn btn-lg btn-success">{% trans 'Getting started guide' %}</a>
+          </p>
+        </section>
+
+        <!-- Search -->
+        <section>
+          <h3>Search all the docs</h3>
+
+          <form action="/search/" method="GET" class="form-row">
+            <div class="form-group col-sm-9">
+              <label for="search_input" class="sr-only">Password</label>
+              <input type="text" class="form-control" id="search_input" placeholder="Search Read the Docs">
+            </div>
+            <div class="form-group col-sm-3">
+              <button type="submit" class="btn btn-outline-dark btn-block mb-2"><span class="fa fa-search" aria-hidden="true"></span> Search</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Featured Projects -->
+
+        {% if featured_list %}
+          <section>
+            {% get_current_language as language %}
+              <!-- BEGIN projects list -->
+              <h3>{% trans "Featured Projects" %}</h3>
+
+              <div class="list-group">
+                {% for project in featured_list %}
+                  <a href="{{ project.get_absolute_url }}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                      <h5 class="mb-1">{{ project.name }}</h5>
+
+                    </div>
+
+                    {% if project.description %}<p class="mb-0">{{ project.description }}</p>{% endif %}
+                    <small class="text-muted">Built 3 days ago</small>
+                  </a>
+                {% endfor %}
+              </div>
+              <!-- END projects list -->
+          </section>
+        {% endif %}
+
+
+        <!-- Funding & Sponsors -->
+        <section class="my-5">
+          <h3>{% trans "Read the Docs is funded by the community" %}</h3>
+
+          {% url "advertising" as advertising_url %}
+          {% url "donate" as sponsors_url %}
+          {% url "gold_detail" as gold_detail %}
+          <p>
+            {% blocktrans trimmed %}
+            Read the Docs is a huge resource that millions of developers rely on
+            for software documentation. It would not be possible without the
+            support of our
+            <a href="{{ sponsors_url }}">sponsors</a>,
+            <a href="{{ advertising_url }}">advertisers</a>,
+            and <a href="{{ gold_detail }}">readers like you</a>.
+            {% endblocktrans %}
+          </p>
+
+          <p>
+            {% blocktrans trimmed %}
+            Read the Docs is <strong>community supported</strong>.
+            It depends on users like you to contribute to development, support, and operations.
+            You can learn more about how to <a href="https://docs.readthedocs.io/en/latest/contribute.html">contribute</a> in our docs.
+            Thanks so much to our wonderful <a href="https://docs.readthedocs.io/en/latest/team.html">community team</a> who helps us run the site.
+            Read the Docs wouldn't be possible without them.
+            {% endblocktrans %}
+          </p>
+
+          <p>
+            {% blocktrans trimmed %}
+            Hosting for the project is graciously provided by <a href="https://azure.microsoft.com/">Microsoft Azure</a>.
+            {% endblocktrans %}
+          </p>
+        </section>
+
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+
+        <div class="row">
+          <div class="col-sm">
+            <h5>{% trans 'Stay Updated' %}</h5>
+            <ul class="list-unstyled">
+              <li class="my-2">
+                <a href="https://blog.readthedocs.com/">{% trans 'Blog' %}</a>
+              </li>
+            </ul>
+
+            <p class="small">{% trans 'Sign up for our newsletter to get our latest blog updates delivered to your inbox weekly.' %}</p>
+          </div>
+
+          <div class="col-sm">
+            <h5>{% trans 'Get Involved' %}</h5>
+            <ul class="list-unstyled">
+              <li class="my-2">
+                <a href="https://docs.readthedocs.io/en/latest/getting_started.html">{% trans 'Getting Started Guide' %}</a>
+              </li>
+              <li class="my-2">
+                <a href="https://docs.readthedocs.io">{% trans 'Documentation' %}</a>
+              </li>
+              <li class="my-2">
+                <a href="https://docs.readthedocs.io/en/latest/contribute.html">{% trans 'Contributing' %}</a>
+              </li>
+              <li class="my-2">
+                <a href="https://docs.readthedocs.io/en/latest/team.html">{% trans 'Team' %}</a>
+              </li>
+              <li class="my-2">
+                <a href="https://docs.readthedocs.io/en/latest/open-source-philosophy.html">{% trans 'Open Source Philosophy' %}</a>
+              </li>
+            </ul>
+          </div>
+          <div class="col-sm">
+            <h5>{% trans 'Business Info' %}</h5>
+            <ul class="list-unstyled">
+              <li class="my-2">
+                {% url "advertising" as advertising_url %}
+                <a href="{{ advertising_url | default:'https://readthedocs.org/sustainability/advertising/' }}">{% trans 'Advertise with Us' %}</a>
+              </li>
+              <li class="my-2">
+                <a href="https://readthedocs.com">{% trans 'Private Hosting' %}</a>
+              </li>
+              <li class="my-2">
+                {% url "donate" as donate_url %}
+                <a href='{{ donate_url }}'>{% trans 'Supporters' %}</a>
+              </li>
+              <li class="my-2">
+                <a href="https://docs.readthedocs.io/en/latest/privacy-policy.html">{% trans 'Privacy Policy' %}</a>
+              </li>
+              <li class="my-2">
+                <a href="https://read-the-docs-guidelines.readthedocs-hosted.com/">{% trans 'Branding' %}</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <ul class="list-inline text-center my-4">
+          <li class="list-inline-item">
+            <a href="https://github.com/rtfd/readthedocs.org"><span class="fa fa-2x fa-github" aria-hidden="true"></span></a>
+          </li>
+          <li class="list-inline-item">
+            <a href="https://twitter.com/readthedocs"><span class="fa fa-2x fa-twitter" aria-hidden="true"></span></a>
+          </li>
+        </ul>
+
+        <hr class="bg-light">
+
+        <div class="row">
+          <div class="col-sm">
+            <p>
+              <small>&copy; Copyright {% now "Y" %}, {% trans 'Read the Docs, Inc & contributors' %}</small>
+            </p>
+            <p>
+              <small>{% trans 'Version' %} <a href="http://docs.readthedocs.io/en/latest/changelog.html">{% readthedocs_version %}</a></small>
+            </p>
+          </div>
+
+          <div class="col-sm">
+            {% block language-select-form %}
+            {% get_current_language as current_lang %}
+            <form action="/i18n/setlang/" method="post" class="form-inline justify-content-end">
+              {% csrf_token %}
+              <input name="next" type="hidden" value="/" />
+
+              <select name="language" class="mb-2 form-control form-control-sm">
+                {% for lang in LANGUAGES %}
+                  {% if lang.0 == current_lang %}
+                  <option selected="selected" value="{{ lang.0 }}">{{ lang.0|language_name_local }} [{{ lang.1 }}]</option>
+                  {% else %}
+                  <option value="{{ lang.0 }}">{{ lang.0|language_name_local }} [{{ lang.1 }}]</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+
+              <button type="submit" class="ml-2 mb-2 btn btn-sm btn-outline-light">{% trans 'Change Language' %}</button>
+
+            </form>
+          {% endblock language-select-form %}
+          </div>
+        </div>
+
+      </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{% static 'bundle.js' %}"></script>
+  </body>
+</html>

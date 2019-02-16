@@ -170,7 +170,7 @@ class CommunityBaseSettings(Settings):
     ADMIN_MEDIA_PREFIX = '/media/admin/'
     STATICFILES_DIRS = [
         os.path.join(SITE_ROOT, 'readthedocs', 'static'),
-        os.path.join(SITE_ROOT, 'media'),
+        os.path.join(SITE_ROOT, 'assets', 'dist'),
     ]
     STATICFILES_FINDERS = [
         'readthedocs.core.static.SelectiveFileSystemFinder',
